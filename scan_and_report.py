@@ -14,29 +14,37 @@ Downloads 資料夾掃描與整理報告產生器
 import os
 import hashlib
 import json
+import configparser
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
 # ============================================================
-# 設定區
+# 讀取設定 (config.ini)
 # ============================================================
-TARGET_DIR = r"D:\Users\klinlin\Downloads"
-REPORT_DIR = r"f:\Antigravity\AutoFolderOrganization"
+config = configparser.ConfigParser()
+config.read(os.path.join(os.path.dirname(__file__), "config.ini"), encoding="utf-8")
+
+TARGET_DIR = config.get("Settings", "TargetDir", fallback=r"D:\Users\klinlin\Downloads")
+REPORT_DIR = config.get("Settings", "ReportDir", fallback=r"f:\Antigravity\AutoFolderOrganization")
 REPORT_FILE = os.path.join(REPORT_DIR, "organization_report.txt")
 REPORT_JSON = os.path.join(REPORT_DIR, "organization_report.json")
-LARGE_FILE_THRESHOLD = 100 * 1024 * 1024  # 100 MB
 
-# 分類規則（小寫副檔名）
-CATEGORY_MAP = {
-    "Images": {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".ico",
-               ".webp", ".jfif", ".tiff", ".tif"},
-    "Documents": {".pdf", ".doc", ".docx", ".xls", ".xlsx", ".xlsm",
-                  ".ppt", ".pptx", ".odt", ".csv", ".txt", ".rtf"},
-    "Media": {".mp4", ".mp3", ".avi", ".mkv", ".mov", ".wav", ".flv",
-              ".wmv", ".wma", ".aac", ".ogg"},
-    "Archives": {".zip", ".rar", ".7z", ".tar", ".gz", ".bz2", ".xz"},
-}
+threshold_mb = config.getint("Settings", "LargeFileThresholdMB", fallback=100)
+LARGE_FILE_THRESHOLD = threshold_mb * 1024 * 1024
+
+# 分類規則自 config.ini 讀取
+CATEGORY_MAP = {}
+if "Categories" in config:
+    for cat in config["Categories"]:
+        exts = [e.strip().lower() for e in config["Categories"][cat].split(",")]
+        CATEGORY_MAP[cat.capitalize()] = set(exts)
+else:
+    # Fallback 預設
+    CATEGORY_MAP = {
+        "Images": {".jpg", ".jpeg", ".png", ".gif"},
+        "Documents": {".pdf", ".doc", ".docx", ".xls", ".xlsx"},
+    }
 
 
 def get_category(ext: str) -> str:

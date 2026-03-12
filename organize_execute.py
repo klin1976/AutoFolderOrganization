@@ -9,12 +9,16 @@ Downloads 資料夾整理執行器
 import os
 import json
 import shutil
+import configparser
 from datetime import datetime
 
 # ============================================================
-# 設定區
+# 讀取設定 (config.ini)
 # ============================================================
-TARGET_DIR = r"D:\Users\klinlin\Downloads"
+config = configparser.ConfigParser()
+config.read(os.path.join(os.path.dirname(__file__), "config.ini"), encoding="utf-8")
+
+TARGET_DIR = config.get("Settings", "TargetDir", fallback=r"D:\Users\klinlin\Downloads")
 REPORT_JSON = r"f:\Antigravity\AutoFolderOrganization\organization_report.json"
 BACKUP_LOG = r"f:\Antigravity\AutoFolderOrganization\execution_log.txt"
 
