@@ -27,8 +27,13 @@ config.read(os.path.join(os.path.dirname(__file__), "config.ini"), encoding="utf
 
 TARGET_DIR = config.get("Settings", "TargetDir", fallback=r"D:\Users\klinlin\Downloads")
 REPORT_DIR = config.get("Settings", "ReportDir", fallback=r"f:\Antigravity\AutoFolderOrganization")
-REPORT_FILE = os.path.join(REPORT_DIR, "organization_report.txt")
-REPORT_JSON = os.path.join(REPORT_DIR, "organization_report.json")
+
+# 從 ini 讀取檔名，並結合目錄
+report_filename = config.get("Settings", "ReportFile", fallback="organization_report.txt")
+json_filename = config.get("Settings", "ReportJson", fallback="organization_report.json")
+
+REPORT_FILE = os.path.join(REPORT_DIR, report_filename)
+REPORT_JSON = os.path.join(REPORT_DIR, json_filename)
 
 threshold_mb = config.getint("Settings", "LargeFileThresholdMB", fallback=100)
 LARGE_FILE_THRESHOLD = threshold_mb * 1024 * 1024

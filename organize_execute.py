@@ -19,8 +19,14 @@ config = configparser.ConfigParser()
 config.read(os.path.join(os.path.dirname(__file__), "config.ini"), encoding="utf-8")
 
 TARGET_DIR = config.get("Settings", "TargetDir", fallback=r"D:\Users\klinlin\Downloads")
-REPORT_JSON = r"f:\Antigravity\AutoFolderOrganization\organization_report.json"
-BACKUP_LOG = r"f:\Antigravity\AutoFolderOrganization\execution_log.txt"
+REPORT_DIR = config.get("Settings", "ReportDir", fallback=r"f:\Antigravity\AutoFolderOrganization")
+
+# 從 ini 讀取檔名，並結合目錄
+json_filename = config.get("Settings", "ReportJson", fallback="organization_report.json")
+log_filename = config.get("Settings", "BackupLog", fallback="execution_log.txt")
+
+REPORT_JSON = os.path.join(REPORT_DIR, json_filename)
+BACKUP_LOG = os.path.join(REPORT_DIR, log_filename)
 
 def log(msg, file=None):
     print(msg)
