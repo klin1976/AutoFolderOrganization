@@ -18,8 +18,14 @@ from datetime import datetime
 config = configparser.ConfigParser()
 config.read(os.path.join(os.path.dirname(__file__), "config.ini"), encoding="utf-8")
 
-TARGET_DIR = config.get("Settings", "TargetDir", fallback=r"D:\Users\klinlin\Downloads")
-REPORT_DIR = config.get("Settings", "ReportDir", fallback=r"f:\Antigravity\AutoFolderOrganization")
+if "Settings" not in config:
+    raise ValueError("❌ 找不到 [Settings] 區塊，請檢查 config.ini")
+
+TARGET_DIR = config.get("Settings", "TargetDir")
+REPORT_DIR = config.get("Settings", "ReportDir")
+
+if not TARGET_DIR or not REPORT_DIR:
+    raise ValueError("❌ config.ini 中的 TargetDir 或 ReportDir 未設定！")
 
 # 從 ini 讀取檔名，並結合目錄
 json_filename = config.get("Settings", "ReportJson", fallback="organization_report.json")
